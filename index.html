@@ -2,83 +2,33 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QR Generator - fcapex7.com</title>
+  <title>Ficha Técnica - fcapex7.com</title>
+  <script>
+    const WEB_APP_URL = "PEGA_AQUI_LA_URL_DE_TU_WEB_APP_DE_C4";
+    const params = new URLSearchParams(window.location.search);
+    const idMotor = params.get('id');
+
+    // Si alguien escanea el QR con ?id=MOTOR-01, redirige directo a tu Web App
+    if (idMotor) {
+      window.location.replace(`${WEB_APP_URL}?id=${encodeURIComponent(idMotor)}`);
+    }
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      background-color: #f8fafc;
-      color: #0f172a;
-    }
-    .card {
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-      text-align: center;
-    }
-    #qrcode {
-      margin: 1.5rem auto;
-      display: flex;
-      justify-content: center;
-    }
-    .label {
-      font-size: 0.9rem;
-      color: #64748b;
-      word-break: break-all;
-      max-width: 280px;
-    }
-    button {
-      margin-top: 1rem;
-      padding: 0.6rem 1.2rem;
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 500;
-    }
-    button:hover { background: #1d4ed8; }
+    body { font-family: system-ui, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f8fafc; }
+    .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgb(0 0 0 / 0.1); text-align: center; }
   </style>
 </head>
 <body>
-  <div class="card">
+  <div class="card" id="contenedor">
     <div id="qrcode"></div>
-    <div class="label" id="texto-qr"></div>
-    <button onclick="descargarQR()">Descargar PNG</button>
+    <p id="texto" style="color:#64748b; font-size:0.9rem;"></p>
   </div>
-
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const data = params.get('data') || 'https://fcapex7.com';
-    const size = parseInt(params.get('size')) || 250;
-
-    document.getElementById('texto-qr').innerText = data;
-
-    new QRCode(document.getElementById("qrcode"), {
-      text: data,
-      width: size,
-      height: size,
-      colorDark : "#000000",
-      colorLight : "#ffffff",
-      correctLevel : QRCode.CorrectLevel.H
-    });
-
-    function descargarQR() {
-      const img = document.querySelector('#qrcode img');
-      if (img) {
-        const link = document.createElement('a');
-        link.href = img.src;
-        link.download = 'codigo-qr.png';
-        link.click();
-      }
+    const data = params.get('data');
+    if (data && !idMotor) {
+      document.getElementById('texto').innerText = data;
+      new QRCode(document.getElementById("qrcode"), { text: data, width: 250, height: 250 });
     }
   </script>
 </body>
