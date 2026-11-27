@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Generator - fcapex7.com</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      text-align: center;
+    }
+    #qrcode {
+      margin: 1.5rem auto;
+      display: flex;
+      justify-content: center;
+    }
+    .label {
+      font-size: 0.9rem;
+      color: #64748b;
+      word-break: break-all;
+      max-width: 280px;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.6rem 1.2rem;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    button:hover { background: #1d4ed8; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div id="qrcode"></div>
+    <div class="label" id="texto-qr"></div>
+    <button onclick="descargarQR()">Descargar PNG</button>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const data = params.get('data') || 'https://fcapex7.com';
+    const size = parseInt(params.get('size')) || 250;
+
+    document.getElementById('texto-qr').innerText = data;
+
+    new QRCode(document.getElementById("qrcode"), {
+      text: data,
+      width: size,
+      height: size,
+      colorDark : "#000000",
+      colorLight : "#ffffff",
+      correctLevel : QRCode.CorrectLevel.H
+    });
+
+    function descargarQR() {
+      const img = document.querySelector('#qrcode img');
+      if (img) {
+        const link = document.createElement('a');
+        link.href = img.src;
+        link.download = 'codigo-qr.png';
+        link.click();
+      }
+    }
+  </script>
+</body>
+</html>
