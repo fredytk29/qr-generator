@@ -2,33 +2,116 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ficha Técnica - fcapex7.com</title>
-  <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyFSR8m0CkPsi8DfV9TFsZLGU4P9gQ8mDI-YLE1kupIRFvl09jUAhvzx7TFypDFzbW7PQ/exec";
-    const params = new URLSearchParams(window.location.search);
-    const idMotor = params.get('id');
-
-    // Si alguien escanea el QR con ?id=MOTOR-01, redirige directo a tu Web App
-    if (idMotor) {
-      window.location.replace(`${WEB_APP_URL}?id=${encodeURIComponent(idMotor)}`);
-    }
-  </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
-    body { font-family: system-ui, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f8fafc; }
-    .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgb(0 0 0 / 0.1); text-align: center; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f1f5f9; margin: 0; padding: 16px; }
+    .card { max-width: 500px; margin: 0 auto; background: #ffffff; border-radius: 16px; box-shadow: 0 6px 20px rgba(15,23,42,0.12); overflow: hidden; border: 1px solid #e2e8f0; }
+    .header { background: #0f172a; color: #ffffff; padding: 22px 20px; }
+    .sub { font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: #94a3b8; font-weight: 600; }
+    h1 { margin: 6px 0 2px; font-size: 26px; letter-spacing: -0.3px; }
+    .ubicacion { font-size: 14px; color: #cbd5e1; margin-top: 2px; }
+    .badge { display: inline-block; margin-top: 12px; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #ffffff; }
+    .body { padding: 20px; }
+    h3 { margin: 0 0 10px; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase; color: #475569; border-bottom: 1px solid #e2e8f0; padding-bottom: 6px; }
+    h3.mt { margin-top: 22px; margin-bottom: 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+    td { padding: 9px 0; vertical-align: top; }
+    td.lbl { padding-right: 8px; color: #64748b; width: 48%; }
+    td.val { font-weight: 600; text-align: right; color: #0f172a; word-break: break-word; }
+    tr + tr td { border-top: 1px solid #f1f5f9; }
+    .grid-mantto { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .box-mantto { flex: 1; min-width: 135px; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; }
+    .box-tec { background: #f8fafc; padding: 10px 12px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; gap: 10px; }
+    .box-nota { background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 14px; color: #334155; line-height: 1.45; margin-bottom: 10px; white-space: pre-line; }
+    .btn-link { display: block; text-align: center; padding: 11px 14px; background: #0f172a; color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: 600; margin-top: 8px; }
+    .footer { background: #f8fafc; padding: 11px 20px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; }
+    .msg { max-width: 440px; margin: 40px auto; padding: 28px; border-radius: 16px; background: #ffffff; border: 1px solid #cbd5e1; text-align: center; color: #475569; }
   </style>
 </head>
 <body>
-  <div class="card" id="contenedor">
-    <div id="qrcode"></div>
-    <p id="texto" style="color:#64748b; font-size:0.9rem;"></p>
-  </div>
+  <div id="app"><div class="msg">Cargando ficha técnica...</div></div>
+
   <script>
-    const data = params.get('data');
-    if (data && !idMotor) {
-      document.getElementById('texto').innerText = data;
-      new QRCode(document.getElementById("qrcode"), { text: data, width: 250, height: 250 });
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwjB96hn3x3j0dxbNngAH2IDVFjUskyfuIDuZTOkTGXhU4uV4nC3e4P-G0C4mWYangr5g/exec";
+    const idMotor = new URLSearchParams(window.location.search).get('id');
+    const app = document.getElementById('app');
+
+    function esc(t) {
+      return String(t || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    if (!idMotor) {
+      app.innerHTML = `<div class="msg"><div style="font-size:34px;margin-bottom:10px;">⚙️</div><h2 style="color:#0f172a;margin:0 0 8px;">Visor QR Dinámico Activo</h2><p style="margin:0;font-size:14px;">Escanea el código QR del motor para consultar sus especificaciones en tiempo real.</p></div>`;
+    } else {
+      fetch(`${WEB_APP_URL}?id=${encodeURIComponent(idMotor)}&format=json`)
+        .then(r => r.json())
+        .then(res => {
+          if (!res.ok) {
+            app.innerHTML = `<div class="msg" style="background:#fff1f2;border-color:#fecdd3;"><h2 style="color:#be123c;margin:0 0 8px;">Motor no encontrado</h2><p style="margin:0;">El código <strong>${esc(idMotor)}</strong> no está registrado en la base de datos.</p></div>`;
+            return;
+          }
+          const f = res.ficha;
+          document.title = `Ficha Técnica - ${f.id}`;
+
+          let specHtml = '';
+          if (f.especificaciones && f.especificaciones.length) {
+            const rows = f.especificaciones.map(item =>
+              `<tr><td class="lbl">${esc(item.etiqueta)}</td><td class="val">${item.valor ? esc(item.valor) : '<span style="color:#94a3b8;font-weight:400;">—</span>'}</td></tr>`
+            ).join('');
+            specHtml = `<h3>Especificaciones Técnicas</h3><table>${rows}</table>`;
+          }
+
+          let manttoHtml = '';
+          if (f.ultimoMantto || f.proximoMantto || (f.tecnicos && f.tecnicos.length) || (f.notas && f.notas.length)) {
+            manttoHtml += `<h3 class="mt">Control de Mantenimiento</h3>`;
+            if (f.ultimoMantto || f.proximoMantto) {
+              manttoHtml += `<div class="grid-mantto">`;
+              if (f.ultimoMantto) {
+                manttoHtml += `<div class="box-mantto"><div style="font-size:12px;color:#64748b;">${esc(f.ultimoMantto.etiqueta)}</div><div style="font-size:16px;font-weight:700;color:#0f172a;margin-top:4px;">${esc(f.ultimoMantto.valor)}</div></div>`;
+              }
+              if (f.proximoMantto) {
+                const c = f.proxColores;
+                const alerta = f.alertaTexto ? `<div style="font-size:11px;font-weight:700;color:${c.lbl};margin-top:4px;">${esc(f.alertaTexto)}</div>` : '';
+                manttoHtml += `<div class="box-mantto" style="background:${c.bg};border-color:${c.bdr};"><div style="font-size:12px;color:${c.lbl};">${esc(f.proximoMantto.etiqueta)}</div><div style="font-size:16px;font-weight:700;color:${c.val};margin-top:4px;">${esc(f.proximoMantto.valor)}</div>${alerta}</div>`;
+              }
+              manttoHtml += `</div>`;
+            }
+            if (f.tecnicos) {
+              f.tecnicos.forEach(t => {
+                manttoHtml += `<div class="box-tec"><span style="color:#64748b;">${esc(t.etiqueta)}:</span><strong style="color:#0f172a;text-align:right;">${esc(t.valor)}</strong></div>`;
+              });
+            }
+            if (f.notas) {
+              f.notas.forEach((n, idx) => {
+                const tit = f.notas.length === 1 ? 'Observaciones / Trabajos realizados:' : `${esc(n.etiqueta)}:`;
+                manttoHtml += `<div class="box-nota"><strong style="display:block;margin-bottom:4px;color:#0f172a;">${tit}</strong>${esc(n.valor)}</div>`;
+              });
+            }
+          }
+
+          let enlacesHtml = '';
+          if (f.enlaces && f.enlaces.length) {
+            enlacesHtml = `<div style="margin-top:14px;">` + f.enlaces.map(l =>
+              `<a class="btn-link" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">📎 Abrir ${esc(l.etiqueta)} ↗</a>`
+            ).join('') + `</div>`;
+          }
+
+          app.innerHTML = `
+            <div class="card">
+              <div class="header">
+                <div class="sub">Ficha Técnica</div>
+                <h1>${esc(f.id)}</h1>
+                ${f.ubicacion ? `<div class="ubicacion">${esc(f.ubicacion)}</div>` : ''}
+                ${f.estado ? `<span class="badge" style="background:${f.estadoColor};">${esc(f.estado)}</span>` : ''}
+              </div>
+              <div class="body">${specHtml}${manttoHtml}${enlacesHtml}</div>
+              <div class="footer">${esc(res.pie)}</div>
+            </div>`;
+        })
+        .catch(() => {
+          app.innerHTML = `<div class="msg">Error al conectar con la base de datos.</div>`;
+        });
     }
   </script>
 </body>
